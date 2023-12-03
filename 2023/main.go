@@ -6,7 +6,8 @@ func check(e error) {
 	}
 }
 
-func main() {
+func Run() {
 	Day01(false)
 	Day02(false)
+	Day03(false)
 }
