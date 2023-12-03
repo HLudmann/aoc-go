@@ -1,7 +1,8 @@
-package a23d2
+package y2023
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -26,7 +27,7 @@ func toInt(str string) int {
 	return digit
 }
 
-func parse(input string) (games []Game) {
+func parseGames(input string) (games []Game) {
 	for _, line := range strings.Split(input, "\n") {
 		if line == "" {
 			continue
@@ -70,9 +71,9 @@ func possibleSets(bag map[string]int, sets []Set) bool {
 	return true
 }
 
-func Puzzle1(input string) string {
+func day02Part1(input string) string {
 	bag := map[string]int{"red": 12, "green": 13, "blue": 14}
-	games := parse(input)
+	games := parseGames(input)
 	var sum int
 
 	for _, game := range games {
@@ -100,11 +101,26 @@ func (g Game) Power() int {
 	return power
 }
 
-func Puzzle2(input string) string {
-	games := parse(input)
+func day02Part2(input string) string {
+	games := parseGames(input)
 	var sum int
 	for _, game := range games {
 		sum += game.Power()
 	}
 	return fmt.Sprint(sum)
+}
+
+func Day02(test bool) {
+	path := "inputs/2023/day02.txt"
+	if test {
+		path = strings.Replace(path, "day02", "day02-test", 1)
+	}
+
+	input, err := os.ReadFile(path)
+
+	check(err)
+	p1 := day02Part1(string(input))
+	p2 := day02Part2(string(input))
+
+	fmt.Printf("Day 02\n\tPuzzle 1: %s\n\tPuzzle 2: %s\n", p1, p2)
 }
