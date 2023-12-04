@@ -1,0 +1,30 @@
+package y2023
+
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+func dayXXPart1(input string) string {
+	return ""
+}
+
+func dayXXPart2(input string) string {
+	return ""
+}
+
+func DayXX(test bool) {
+	path := "inputs/2023/dayXX.txt"
+	if test {
+		path = strings.Replace(path, "dayXX", "dayXX-test", 1)
+	}
+
+	input, err := os.ReadFile(path)
+
+	check(err)
+	p1 := dayXXPart1(string(input))
+	p2 := dayXXPart2(string(input))
+
+	fmt.Printf("Day XX\n\tPuzzle 1: %s\n\tPuzzle 2: %s\n", p1, p2)
+}

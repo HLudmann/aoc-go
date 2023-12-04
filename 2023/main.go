@@ -7,7 +7,9 @@ func check(e error) {
 }
 
 func Run() {
-	Day01(false)
-	Day02(false)
-	Day03(false)
+	// Day01(false)
+	// Day02(false)
+	// Day03(false)
+	// Day04(true)
+	Day04(false)
 }
