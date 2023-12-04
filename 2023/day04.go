@@ -55,23 +55,28 @@ func parseCards(input string) (cards []card) {
 
 func day04Part1(input string) string {
 	var sum int
-	for _, c := range parseCards(input) {
-		sum += c.Worth()
+	for _, line := range strings.Split(input, "\n") {
+		if line == "" {
+			continue
+		}
+		sum += parseCard(line).Worth()
 	}
 	return fmt.Sprint(sum)
 }
 
 func day04Part2(input string) string {
 	var sum int
-	cards := parseCards(input)
-	buffer := make([]int, len(cards[0].winningNumbers))
-	for i := 0; i < len(cards[0].winningNumbers); i++ {
+	buffer := make([]int, 10)
+	for i := 0; i < 10; i++ {
 		buffer[i] = 1
 	}
-	for _, c := range cards {
+	for _, line := range strings.Split(input, "\n") {
+		if line == "" {
+			continue
+		}
 		nbr_card := buffer[0]
 		buffer = append(buffer[1:], 1)
-		for i := 0; i < c.Winners(); i++ {
+		for i := 0; i < parseCard(line).Winners(); i++ {
 			buffer[i] += nbr_card
 		}
 		sum += nbr_card
