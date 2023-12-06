@@ -43,16 +43,6 @@ func parseCard(card_str string) card {
 	return card{card_id, winningNumbers, numbers}
 }
 
-func parseCards(input string) (cards []card) {
-	for _, line := range strings.Split(input, "\n") {
-		if line == "" {
-			continue
-		}
-		cards = append(cards, parseCard(line))
-	}
-	return
-}
-
 func day04Part1(input string) string {
 	var sum int
 	for _, line := range strings.Split(input, "\n") {
