@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -26,12 +25,6 @@ func day01Part1(input string) string {
 	}
 
 	return fmt.Sprint(sum)
-}
-
-func toDigit(str string) int {
-	digit, err := strconv.Atoi(str)
-	check(err)
-	return digit
 }
 
 func day01Part2(input string) string {

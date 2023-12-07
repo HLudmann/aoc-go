@@ -3,7 +3,6 @@ package y2023
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -17,14 +16,6 @@ type Set []Cubes
 type Game struct {
 	Id   int
 	Sets []Set
-}
-
-func toInt(str string) int {
-	digit, err := strconv.Atoi(str)
-	if err != nil {
-		panic(err)
-	}
-	return digit
 }
 
 func parseGames(input string) (games []Game) {
