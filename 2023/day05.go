@@ -7,21 +7,21 @@ import (
 	"strings"
 )
 
-type conversionRange struct {
+type ConversionRange struct {
 	Destination int
 	Source      int
 	Size        int
 }
 
-func (cr conversionRange) Contains(value int) bool {
+func (cr ConversionRange) Contains(value int) bool {
 	return cr.Source <= value && value < cr.Source+cr.Size
 }
 
-func (cr conversionRange) Convert(value int) int {
+func (cr ConversionRange) Convert(value int) int {
 	return cr.Destination + value - cr.Source
 }
 
-func (cr conversionRange) Intersection(sr []int) []int {
+func (cr ConversionRange) Intersection(sr []int) []int {
 	if cr.Source+cr.Size < sr[0] || sr[0]+sr[1] < cr.Source {
 		return []int{0, 0}
 	}
@@ -34,11 +34,11 @@ func (cr conversionRange) Intersection(sr []int) []int {
 	}
 }
 
-type conversionMap struct {
-	Ranges []conversionRange
+type ConversionMap struct {
+	Ranges []ConversionRange
 }
 
-func (cm conversionMap) Convert(value int) int {
+func (cm ConversionMap) Convert(value int) int {
 	for _, cr := range cm.Ranges {
 		if cr.Contains(value) {
 			return cr.Convert(value)
@@ -47,7 +47,7 @@ func (cm conversionMap) Convert(value int) int {
 	return value
 }
 
-func (cm conversionMap) ConvertRange(seedRange []int) [][]int {
+func (cm ConversionMap) ConvertRange(seedRange []int) [][]int {
 	var ranges [][]int
 	start := seedRange[0]
 	last := seedRange[0] + seedRange[1] - 1
@@ -72,7 +72,7 @@ func (cm conversionMap) ConvertRange(seedRange []int) [][]int {
 	return ranges
 }
 
-func (cm conversionMap) ConvertRanges(seedRanges [][]int) [][]int {
+func (cm ConversionMap) ConvertRanges(seedRanges [][]int) [][]int {
 	var ranges [][]int
 	for _, sr := range seedRanges {
 		ranges = append(ranges, cm.ConvertRange(sr)...)
@@ -90,31 +90,31 @@ func minimum(locations [][]int) int {
 	return minLoc
 }
 
-func parseSeedAndMaps(input string) (seeds []int, cms []conversionMap) {
-	seeds_n_maps := strings.Split(input[:len(input)-1], "\n\n")
+func parseSeedAndMaps(input string) (seeds []int, cms []ConversionMap) {
+	seedsAndMaps := strings.Split(input[:len(input)-1], "\n\n")
 
-	for _, seed_str := range strings.Split(seeds_n_maps[0][7:], " ") {
-		seeds = append(seeds, toInt(seed_str))
+	for _, seedStr := range strings.Split(seedsAndMaps[0][7:], " ") {
+		seeds = append(seeds, toInt(seedStr))
 	}
 
-	for _, map_description := range seeds_n_maps[1:] {
-		var cm conversionMap
-		for _, range_str := range strings.Split(map_description, "\n")[1:] {
-			dest_src_size := strings.Split(range_str, " ")
-			cm.Ranges = append(cm.Ranges, conversionRange{
-				toInt(dest_src_size[0]),
-				toInt(dest_src_size[1]),
-				toInt(dest_src_size[2]),
+	for _, mapsStr := range seedsAndMaps[1:] {
+		var cm ConversionMap
+		for _, rangeStr := range strings.Split(mapsStr, "\n")[1:] {
+			destSrcSize := strings.Split(rangeStr, " ")
+			cm.Ranges = append(cm.Ranges, ConversionRange{
+				toInt(destSrcSize[0]),
+				toInt(destSrcSize[1]),
+				toInt(destSrcSize[2]),
 			})
 		}
-		slices.SortStableFunc(cm.Ranges, func(a, b conversionRange) int { return a.Source - b.Source })
+		slices.SortStableFunc(cm.Ranges, func(a, b ConversionRange) int { return a.Source - b.Source })
 		cms = append(cms, cm)
 	}
 
 	return
 }
 
-func seedToLocation(maps []conversionMap, seed int) (val int) {
+func seedToLocation(maps []ConversionMap, seed int) (val int) {
 	val = seed
 	for _, m := range maps {
 		val = m.Convert(val)
@@ -122,7 +122,7 @@ func seedToLocation(maps []conversionMap, seed int) (val int) {
 	return
 }
 
-func seedRangeToLocation(maps []conversionMap, seedRange []int) int {
+func seedRangeToLocation(maps []ConversionMap, seedRange []int) int {
 	locRanges := [][]int{seedRange}
 
 	for _, cm := range maps {
@@ -144,43 +144,43 @@ func day05Part1(input string) string {
 		}()
 	}
 
-	min_loc := -1
+	minLoc := -1
 	for i := 0; i < len(seeds); i++ {
 		location := <-locations
-		if min_loc == -1 || location < min_loc {
-			min_loc = location
+		if minLoc == -1 || location < minLoc {
+			minLoc = location
 		}
 	}
 
-	return fmt.Sprint(min_loc)
+	return fmt.Sprint(minLoc)
 }
 
 func day05Part2(input string) string {
-	seed_info, maps := parseSeedAndMaps(input)
+	seedRangesStr, maps := parseSeedAndMaps(input)
 
-	var seed_ranges [][]int
-	for i := 0; i < len(seed_info); i += 2 {
-		seed_ranges = append(seed_ranges, []int{seed_info[i], seed_info[i+1]})
+	var seedRanges [][]int
+	for i := 0; i < len(seedRangesStr); i += 2 {
+		seedRanges = append(seedRanges, []int{seedRangesStr[i], seedRangesStr[i+1]})
 	}
 
-	locations := make(chan int, len(seed_ranges))
+	locations := make(chan int, len(seedRanges))
 
-	for _, seedRange := range seed_ranges {
+	for _, seedRange := range seedRanges {
 		sr := seedRange
 		go func() {
 			locations <- seedRangeToLocation(maps, sr)
 		}()
 	}
 
-	min_loc := -1
-	for i := 0; i < len(seed_ranges); i++ {
+	minLoc := -1
+	for i := 0; i < len(seedRanges); i++ {
 		location := <-locations
-		if min_loc == -1 || location < min_loc {
-			min_loc = location
+		if minLoc == -1 || location < minLoc {
+			minLoc = location
 		}
 	}
 
-	return fmt.Sprint(min_loc)
+	return fmt.Sprint(minLoc)
 }
 
 func Day05(test bool) {

@@ -7,23 +7,23 @@ import (
 	"strings"
 )
 
-type pos struct {
+type Pos struct {
 	x, y int
 }
 
-func findAdjacentNumbers(lines []string, used map[pos]bool, p pos) (numbers []int) {
-	x_range := []int{p.x}
+func findAdjacentNumbers(lines []string, used map[Pos]bool, p Pos) (numbers []int) {
+	xRange := []int{p.x}
 	if p.x > 0 {
-		x_range = append(x_range, p.x-1)
+		xRange = append(xRange, p.x-1)
 	}
 	if p.x < len(lines)-1 {
-		x_range = append(x_range, p.x+1)
+		xRange = append(xRange, p.x+1)
 	}
 	re := regexp.MustCompile(`\d+`)
-	for _, x := range x_range {
+	for _, x := range xRange {
 		matches := re.FindAllStringIndex(lines[x], -1)
 		for _, match := range matches {
-			if used[pos{x, match[0]}] {
+			if used[Pos{x, match[0]}] {
 				continue
 			}
 			if p.y < match[0]-1 || match[1] < p.y {
@@ -31,7 +31,7 @@ func findAdjacentNumbers(lines []string, used map[pos]bool, p pos) (numbers []in
 			}
 			number := toInt(lines[x][match[0]:match[1]])
 			for y := match[0]; y < match[1]; y++ {
-				used[pos{x, y}] = true
+				used[Pos{x, y}] = true
 			}
 			numbers = append(numbers, number)
 		}
@@ -40,15 +40,14 @@ func findAdjacentNumbers(lines []string, used map[pos]bool, p pos) (numbers []in
 }
 
 func day03Part1(input string) string {
-	lines := strings.Split(input, "\n")
-	lines = lines[:len(lines)-1]
+	lines := toLines(input)
 	var sum int
-	used := make(map[pos]bool)
-	symbol_re := regexp.MustCompile(`[^\d\n.]`)
+	used := make(map[Pos]bool)
+	symbolRe := regexp.MustCompile(`[^\d\n.]`)
 	for x, line := range lines {
-		symbol_ys := symbol_re.FindAllStringIndex(line, -1)
-		for _, y := range symbol_ys {
-			numbers := findAdjacentNumbers(lines, used, pos{x, y[0]})
+		symbolYs := symbolRe.FindAllStringIndex(line, -1)
+		for _, y := range symbolYs {
+			numbers := findAdjacentNumbers(lines, used, Pos{x, y[0]})
 			for _, number := range numbers {
 				sum += number
 			}
@@ -58,15 +57,14 @@ func day03Part1(input string) string {
 }
 
 func day03Part2(input string) string {
-	lines := strings.Split(input, "\n")
-	lines = lines[:len(lines)-1]
+	lines := toLines(input)
 	var sum int
-	used := make(map[pos]bool)
-	gear_re := regexp.MustCompile(`\*`)
+	used := make(map[Pos]bool)
+	gearRe := regexp.MustCompile(`\*`)
 	for x, line := range lines {
-		symbol_ys := gear_re.FindAllStringIndex(line, -1)
-		for _, y := range symbol_ys {
-			numbers := findAdjacentNumbers(lines, used, pos{x, y[0]})
+		symbolYs := gearRe.FindAllStringIndex(line, -1)
+		for _, y := range symbolYs {
+			numbers := findAdjacentNumbers(lines, used, Pos{x, y[0]})
 			if len(numbers) == 2 {
 				sum += numbers[0] * numbers[1]
 			}

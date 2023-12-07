@@ -19,19 +19,16 @@ type Game struct {
 }
 
 func parseGames(input string) (games []Game) {
-	for _, line := range strings.Split(input, "\n") {
-		if line == "" {
-			continue
-		}
-		game_sets := strings.Split(line, ": ")
-		sets := strings.Split(game_sets[1], "; ")
-		game := Game{toInt(game_sets[0][5:]), make([]Set, len(sets))}
-		for i, set_to_split := range sets {
-			splited_set := strings.Split(set_to_split, ", ")
-			set := make([]Cubes, len(splited_set))
-			for j, cubes_to_split := range splited_set {
-				amount_color := strings.Split(cubes_to_split, " ")
-				set[j] = Cubes{amount_color[1], toInt(amount_color[0])}
+	for _, line := range toLines(input) {
+		gameSets := strings.Split(line, ": ")
+		sets := strings.Split(gameSets[1], "; ")
+		game := Game{toInt(gameSets[0][5:]), make([]Set, len(sets))}
+		for i, setToSplit := range sets {
+			splitedSet := strings.Split(setToSplit, ", ")
+			set := make([]Cubes, len(splitedSet))
+			for j, cubesToSplit := range splitedSet {
+				amountColor := strings.Fields(cubesToSplit)
+				set[j] = Cubes{amountColor[1], toInt(amountColor[0])}
 			}
 			game.Sets[i] = set
 		}

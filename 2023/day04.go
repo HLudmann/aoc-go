@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-type card struct {
+type Card struct {
 	Id             int
 	winningNumbers map[int]bool
 	numbers        []int
 }
 
-func (c card) Winners() (w int) {
+func (c Card) Winners() (w int) {
 	for _, number := range c.numbers {
 		if c.winningNumbers[number] {
 			w++
@@ -22,33 +22,30 @@ func (c card) Winners() (w int) {
 	return
 }
 
-func (c card) Worth() int {
+func (c Card) Worth() int {
 	return int(math.Pow(2, float64(c.Winners()-1)))
 }
 
-func parseCard(card_str string) card {
-	card_win_num := strings.Split(card_str, ": ")
-	card_id := toInt(strings.Fields(card_win_num[0])[1])
+func parseCard(card_str string) Card {
+	cardIdAndNum := strings.Split(card_str, ": ")
+	cardId := toInt(strings.Fields(cardIdAndNum[0])[1])
 
-	winNum_numbers := strings.Split(card_win_num[1], " | ")
+	winNumAndNumbers := strings.Split(cardIdAndNum[1], " | ")
 	winningNumbers := make(map[int]bool)
-	for _, winNum := range strings.Fields(winNum_numbers[0]) {
+	for _, winNum := range strings.Fields(winNumAndNumbers[0]) {
 		winningNumbers[toInt(winNum)] = true
 	}
 	var numbers []int
-	for _, number := range strings.Fields(winNum_numbers[1]) {
+	for _, number := range strings.Fields(winNumAndNumbers[1]) {
 		numbers = append(numbers, toInt(number))
 	}
 
-	return card{card_id, winningNumbers, numbers}
+	return Card{cardId, winningNumbers, numbers}
 }
 
 func day04Part1(input string) string {
 	var sum int
-	for _, line := range strings.Split(input, "\n") {
-		if line == "" {
-			continue
-		}
+	for _, line := range toLines(input) {
 		sum += parseCard(line).Worth()
 	}
 	return fmt.Sprint(sum)
@@ -60,16 +57,13 @@ func day04Part2(input string) string {
 	for i := 0; i < 10; i++ {
 		buffer[i] = 1
 	}
-	for _, line := range strings.Split(input, "\n") {
-		if line == "" {
-			continue
-		}
-		nbr_card := buffer[0]
+	for _, line := range toLines(input) {
+		nbrCard := buffer[0]
 		buffer = append(buffer[1:], 1)
 		for i := 0; i < parseCard(line).Winners(); i++ {
-			buffer[i] += nbr_card
+			buffer[i] += nbrCard
 		}
-		sum += nbr_card
+		sum += nbrCard
 	}
 
 	return fmt.Sprint(sum)

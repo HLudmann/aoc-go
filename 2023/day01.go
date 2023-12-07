@@ -8,20 +8,18 @@ import (
 )
 
 func day01Part1(input string) string {
-	lines := strings.Split(input, "\n")
-
 	re := regexp.MustCompile(`[a-zA-Z]`)
 
 	var sum int
-	for _, line := range lines {
+	for _, line := range toLines(input) {
 		if line == "" {
 			continue
 		}
-		only_digits := re.ReplaceAllString(line, "")
-		first_digit := toDigit(string(only_digits[0]))
-		last_digit := toDigit(string(only_digits[len(only_digits)-1]))
+		onlyDigits := re.ReplaceAllString(line, "")
+		firstDigit := toDigit(string(onlyDigits[0]))
+		lastDigit := toDigit(string(onlyDigits[len(onlyDigits)-1]))
 
-		sum += first_digit*10 + last_digit
+		sum += firstDigit*10 + lastDigit
 	}
 
 	return fmt.Sprint(sum)
