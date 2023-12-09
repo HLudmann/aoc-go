@@ -41,3 +41,10 @@ func Gcd(a, b int) int {
 func Lcm(a, b int) int {
 	return a * b / Gcd(a, b)
 }
+
+func Abs(a int) int {
+	if a < 0 {
+		return a * -1
+	}
+	return a
+}
