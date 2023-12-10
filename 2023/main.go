@@ -1,11 +1,5 @@
 package y2023
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 func Run() {
 	Day01(false)
 	Day02(false)
@@ -16,4 +10,5 @@ func Run() {
 	Day07(false)
 	Day08(false)
 	Day09(false)
+	Day10(false)
 }

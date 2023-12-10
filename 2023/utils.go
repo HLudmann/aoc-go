@@ -5,6 +5,12 @@ import (
 	"strings"
 )
 
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
 func toDigit(str string) int {
 	digit, err := strconv.Atoi(str)
 	check(err)
