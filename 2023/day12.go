@@ -5,18 +5,14 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/schollz/progressbar/v3"
 )
-
-var day12Cache = make(map[string]int)
 
 type SpringRecord struct {
 	Conditions string
 	Groups     []int
 }
 
-func groupsToRegex(groups []int) *regexp.Regexp {
+func groupsToRegex(groups []int) string {
 	strRe := "^[^#]*"
 	l := len(groups)
 	for i, group := range groups {
@@ -26,40 +22,42 @@ func groupsToRegex(groups []int) *regexp.Regexp {
 		}
 	}
 	strRe += "[^#]*$"
-	return regexp.MustCompile(strRe)
+	return strRe
 }
 
-func numberOfCombinations(groups []int, conditions string) int {
-	re := groupsToRegex(groups)
-	key := conditions + re.String()
-	if val, ok := day12Cache[key]; ok {
+func numberOfCombinations(cache *map[string]int, groups []int, conditions string) int {
+	strRe := groupsToRegex(groups)
+	key := conditions + strRe
+	if val, ok := (*cache)[key]; ok {
 		return val
 	}
+	re, err := regexp.Compile(strRe)
+	check(err)
 	if !re.MatchString(conditions) {
-		day12Cache[key] = 0
+		(*cache)[key] = 0
 		return 0
 	}
 
 	if conditions == "" {
-		day12Cache[key] = 1
+		(*cache)[key] = 1
 		return 1
 	}
 
 	result := 0
 	switch conditions[0] {
 	case '?':
-		result = numberOfCombinations(groups, conditions[1:]) + numberOfCombinations(groups, "#"+conditions[1:])
+		result = numberOfCombinations(cache, groups, conditions[1:]) + numberOfCombinations(cache, groups, "#"+conditions[1:])
 	case '.':
-		result = numberOfCombinations(groups, TrimLeft(conditions, '.'))
+		result = numberOfCombinations(cache, groups, TrimLeft(conditions, '.'))
 	default:
 		if len(groups) > 1 {
-			result = numberOfCombinations(groups[1:], conditions[groups[0]+1:])
+			result = numberOfCombinations(cache, groups[1:], conditions[groups[0]+1:])
 		} else {
 			result = len(groups)
 		}
 	}
 
-	day12Cache[key] = result
+	(*cache)[key] = result
 	return result
 }
 
@@ -91,8 +89,9 @@ func day12Part1(input string) string {
 	records := toSpringRecords(input, false)
 
 	var sum int
+	cache := make(map[string]int)
 	for _, rec := range records {
-		sum += numberOfCombinations(rec.Groups, rec.Conditions)
+		sum += numberOfCombinations(&cache, rec.Groups, rec.Conditions)
 	}
 
 	return fmt.Sprint(sum)
@@ -101,11 +100,19 @@ func day12Part1(input string) string {
 func day12Part2(input string) string {
 	records := toSpringRecords(input, true)
 
-	bar := progressbar.Default(int64(len(records)))
+	chans := make(chan int, len(records))
+	for _, rec := range records {
+		c := rec.Conditions
+		g := rec.Groups
+		go func() {
+			cache := make(map[string]int)
+			chans <- numberOfCombinations(&cache, g, c)
+		}()
+	}
+
 	var sum int
-	for _, r := range records {
-		sum += numberOfCombinations(r.Groups, r.Conditions)
-		bar.Add(1)
+	for i := 0; i < len(records); i++ {
+		sum += <-chans
 	}
 
 	return fmt.Sprint(sum)
