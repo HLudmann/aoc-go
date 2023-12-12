@@ -54,3 +54,11 @@ func Abs(a int) int {
 	}
 	return a
 }
+
+func TrimLeft(s string, r rune) string {
+	if s == "" || rune(s[0]) != r {
+		return s
+	}
+
+	return TrimLeft(s[1:], r)
+}
