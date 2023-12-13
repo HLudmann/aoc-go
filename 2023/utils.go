@@ -62,3 +62,38 @@ func TrimLeft(s string, r rune) string {
 
 	return TrimLeft(s[1:], r)
 }
+
+func Transpose[T any](matrix [][]T) [][]T {
+	if len(matrix) == 0 {
+		return matrix
+	}
+	t := make([][]T, len(matrix[0]))
+	for _, row := range matrix {
+		for j, val := range row {
+			t[j] = append(t[j], val)
+		}
+	}
+	return t
+}
+
+func TransposeStr(matrix []string) []string {
+	if len(matrix) == 0 {
+		return matrix
+	}
+	t := make([]string, len(matrix[0]))
+	for _, row := range matrix {
+		for j, val := range row {
+			t[j] = t[j] + string(val)
+		}
+	}
+	return t
+}
+
+func StrDiff(s1, s2 string) (indexes []int) {
+	for i := 0; i < min(len(s1), len(s2)); i++ {
+		if s1[i] != s2[i] {
+			indexes = append(indexes, i)
+		}
+	}
+	return
+}
