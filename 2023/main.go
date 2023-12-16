@@ -15,4 +15,5 @@ func Run() {
 	Day12(false)
 	Day13(false)
 	Day14(false)
+	Day15(false)
 }
