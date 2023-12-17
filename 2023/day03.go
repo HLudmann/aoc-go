@@ -7,10 +7,6 @@ import (
 	"strings"
 )
 
-type Pos struct {
-	x, y int
-}
-
 func findAdjacentNumbers(lines []string, used map[Pos]bool, p Pos) (numbers []int) {
 	xRange := []int{p.x}
 	if p.x > 0 {

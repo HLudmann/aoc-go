@@ -35,6 +35,10 @@ func toLines(input string) (lines []string) {
 	return
 }
 
+type Pos struct {
+	x, y int
+}
+
 func Gcd(a, b int) int {
 	for b != 0 {
 		t := b
