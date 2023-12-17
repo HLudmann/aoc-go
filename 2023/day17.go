@@ -11,8 +11,8 @@ import (
 type HeatLossGraph map[Pos]int
 
 type CityBlock struct {
-	P    Pos
-	Dirs string
+	P   Pos
+	Dir rune
 }
 
 type CityBlockQueue struct {
@@ -43,81 +43,71 @@ func (cbq *CityBlockQueue) Pop() CityBlock {
 	return cb
 }
 
-func (hlm HeatLossGraph) Neighbours(node CityBlock, minF, maxF int) (neigh []CityBlock) {
-	d := "."
-	if l := len(node.Dirs); l > 0 {
-		d = string(node.Dirs[l-1])
+func (hlm HeatLossGraph) Neighbours(node CityBlock, dist, minF, maxF int) map[CityBlock]int {
+	neigh := make(map[CityBlock]int)
+	var side Pos
+	var plus, minus rune
+	switch node.Dir {
+	case '^', 'v':
+		side = Pos{0, 1}
+		minus = '<'
+		plus = '>'
+	case '<', '>':
+		side = Pos{1, 0}
+		minus = '^'
+		plus = 'v'
 	}
-
-	if d == "." || minF <= len(node.Dirs) {
-		if p := (Pos{node.P.x - 1, node.P.y}); hlm[p] != 0 && (d == "." || d == "<" || d == ">") {
-			neigh = append(neigh, CityBlock{p, "^"})
+	dPlus := dist
+	dMinus := dist
+	for i := 1; i <= maxF; i++ {
+		pPlus := node.P.Add(side.Multiply(i))
+		pMinus := node.P.Add(side.Multiply(-i))
+		if d := hlm[pPlus]; d != 0 {
+			dPlus += d
+			if minF <= i {
+				neigh[CityBlock{pPlus, plus}] = dPlus
+			}
 		}
-		if p := (Pos{node.P.x + 1, node.P.y}); hlm[p] != 0 && (d == "." || d == "<" || d == ">") {
-			neigh = append(neigh, CityBlock{p, "v"})
-		}
-		if p := (Pos{node.P.x, node.P.y - 1}); hlm[p] != 0 && (d == "." || d == "^" || d == "v") {
-			neigh = append(neigh, CityBlock{p, "<"})
-		}
-		if p := (Pos{node.P.x, node.P.y + 1}); hlm[p] != 0 && (d == "." || d == "^" || d == "v") {
-			neigh = append(neigh, CityBlock{p, ">"})
-		}
-	}
-
-	if d == "." {
-		return
-	}
-
-	if len(node.Dirs) < maxF {
-		var p Pos
-		switch d {
-		case "^":
-			p = Pos{node.P.x - 1, node.P.y}
-		case "v":
-			p = Pos{node.P.x + 1, node.P.y}
-		case "<":
-			p = Pos{node.P.x, node.P.y - 1}
-		case ">":
-			p = Pos{node.P.x, node.P.y + 1}
-
-		}
-		if hlm[p] != 0 {
-			neigh = append(neigh, CityBlock{p, node.Dirs + d})
-		}
-	}
-	return
-}
-
-func findPath(graph HeatLossGraph, start, goal Pos, minF, maxF int) int {
-	startBlock := CityBlock{start, ""}
-	dist := make(map[CityBlock]int)
-	prev := make(map[CityBlock]CityBlock)
-	dist[startBlock] = 0
-
-	queue := &CityBlockQueue{[]CityBlock{}, 0}
-	for _, n := range graph.Neighbours(startBlock, minF, maxF) {
-		dist[n] = graph[n.P]
-		prev[n] = startBlock
-		queue.Push(n, dist)
-	}
-
-	cb := startBlock
-	for queue.Size != 0 {
-		cb = queue.Pop()
-		if minF <= len(cb.Dirs) && cb.P == goal {
-			return dist[cb]
-		}
-		neigh := graph.Neighbours(cb, minF, maxF)
-		for _, n := range neigh {
-			if d := dist[cb] + graph[n.P]; dist[n] == 0 || d < dist[n] {
-				dist[n] = d
-				queue.Push(n, dist)
-				prev[n] = cb
+		if d := hlm[pMinus]; d != 0 {
+			dMinus += d
+			if minF <= i {
+				neigh[CityBlock{pMinus, minus}] = dMinus
 			}
 		}
 	}
 
-	return 0
+	return neigh
+}
+
+func findPath(graph HeatLossGraph, minF, maxF int) int {
+	dist := make(map[CityBlock]int)
+	queue := &CityBlockQueue{[]CityBlock{}, 0}
+	for n, d := range graph.Neighbours(CityBlock{Pos{0, 0}, '>'}, 0, minF, maxF) {
+		dist[n] = d
+		queue.Push(n, dist)
+	}
+	for n, d := range graph.Neighbours(CityBlock{Pos{0, 0}, 'v'}, 0, minF, maxF) {
+		dist[n] = d
+		queue.Push(n, dist)
+	}
+
+	maxX := int(math.Sqrt(float64(len(graph)))) - 1
+	goal := Pos{maxX, maxX}
+	for queue.Size != 0 {
+		cb := queue.Pop()
+		if cb.P == goal {
+			return dist[cb]
+		}
+		neigh := graph.Neighbours(cb, dist[cb], minF, maxF)
+		for n, d := range neigh {
+			if dist[n] == 0 || d < dist[n] {
+				dist[n] = d
+				queue.Push(n, dist)
+			}
+		}
+	}
+
+	return -1
 }
 
 func day17Part1(input string) string {
@@ -127,8 +117,7 @@ func day17Part1(input string) string {
 			graph[Pos{i, j}] = toInt(string(val))
 		}
 	}
-	maxX := int(math.Sqrt(float64(len(graph)))) - 1
-	return fmt.Sprint(findPath(graph, Pos{0, 0}, Pos{maxX, maxX}, 1, 3))
+	return fmt.Sprint(findPath(graph, 1, 3))
 }
 
 func day17Part2(input string) string {
@@ -138,8 +127,7 @@ func day17Part2(input string) string {
 			graph[Pos{i, j}] = toInt(string(val))
 		}
 	}
-	maxX := int(math.Sqrt(float64(len(graph)))) - 1
-	return fmt.Sprint(findPath(graph, Pos{0, 0}, Pos{maxX, maxX}, 4, 10))
+	return fmt.Sprint(findPath(graph, 4, 10))
 }
 
 func Day17(test bool) {

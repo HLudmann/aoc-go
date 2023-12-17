@@ -39,6 +39,9 @@ type Pos struct {
 	x, y int
 }
 
+func (a Pos) Add(b Pos) Pos      { return Pos{a.x + b.x, a.y + b.y} }
+func (p Pos) Multiply(n int) Pos { return Pos{p.x * n, p.y * n} }
+
 func Gcd(a, b int) int {
 	for b != 0 {
 		t := b
