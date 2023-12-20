@@ -93,8 +93,8 @@ func (mg ModulesGraph) ToDotFile(filename string) error {
 	return draw.DOT(g, file)
 }
 
-func day20Part1(input string) string {
-	modules := make(map[string]*Module)
+func NewModulesGraph(input string) ModulesGraph {
+	mg := make(ModulesGraph)
 	for _, line := range toLines(input) {
 		s := strings.Split(line, " -> ")
 		t := rune(s[0][0])
@@ -105,20 +105,24 @@ func day20Part1(input string) string {
 		}
 
 		for _, n := range next {
-			if m, ok := modules[n]; ok {
+			if m, ok := mg[n]; ok {
 				m.AddPrev(name)
 			} else {
-				modules[n] = NewModule('u', []string{name}, []string{})
+				mg[n] = NewModule('u', []string{name}, []string{})
 			}
 		}
 
-		if m, ok := modules[name]; ok {
+		if m, ok := mg[name]; ok {
 			m.AddTypeAndNext(t, next)
 		} else {
-			modules[name] = NewModule(t, []string{}, next)
+			mg[name] = NewModule(t, []string{}, next)
 		}
 	}
+	return mg
+}
 
+func day20Part1(input string) string {
+	mg := NewModulesGraph(input)
 	var low, high int
 	for i := 0; i < 1000; i++ {
 		queue := []Signal{{false, "button", "broadcaster"}}
@@ -129,7 +133,7 @@ func day20Part1(input string) string {
 			} else {
 				low++
 			}
-			m := modules[s.Dst]
+			m := mg[s.Dst]
 			queue = append(queue[1:], m.ProcessSignal(s)...)
 		}
 	}
@@ -138,35 +142,11 @@ func day20Part1(input string) string {
 }
 
 func day20Part2(input string) string {
-	modules := make(ModulesGraph)
-	for _, line := range toLines(input) {
-		s := strings.Split(line, " -> ")
-		t := rune(s[0][0])
-		next := strings.Split(s[1], ", ")
-		name := s[0][1:]
-		if t == 'b' {
-			name = s[0]
-		}
+	mg := NewModulesGraph(input)
 
-		for _, n := range next {
-			if m, ok := modules[n]; ok {
-				m.AddPrev(name)
-			} else {
-				modules[n] = NewModule('u', []string{name}, []string{})
-			}
-		}
-
-		if m, ok := modules[name]; ok {
-			m.AddTypeAndNext(t, next)
-		} else {
-			modules[name] = NewModule(t, []string{}, next)
-		}
-	}
-
-	subGraphStarts := modules["broadcaster"].Next
 	minimumToRxLow := 1
 
-	for _, start := range subGraphStarts {
+	for _, start := range mg["broadcaster"].Next {
 		var i int
 		sentTrue := false
 		for !sentTrue {
@@ -179,7 +159,7 @@ func day20Part2(input string) string {
 						sentTrue = true
 						break
 					}
-					nq = append(nq, modules[s.Dst].ProcessSignal(s)...)
+					nq = append(nq, mg[s.Dst].ProcessSignal(s)...)
 				}
 				queue = nq
 			}
