@@ -137,7 +137,6 @@ func day20Part1(input string) string {
 			queue = append(queue[1:], m.ProcessSignal(s)...)
 		}
 	}
-	fmt.Println("H:", high, "L:", low)
 	return fmt.Sprint(high * low)
 }
 
