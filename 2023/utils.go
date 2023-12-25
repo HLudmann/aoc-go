@@ -39,8 +39,9 @@ type Pos struct {
 	x, y int
 }
 
-func (a Pos) Add(b Pos) Pos      { return Pos{a.x + b.x, a.y + b.y} }
-func (p Pos) Multiply(n int) Pos { return Pos{p.x * n, p.y * n} }
+func (a Pos) Add(b Pos) Pos       { return Pos{a.x + b.x, a.y + b.y} }
+func (p Pos) Multiply(n int) Pos  { return Pos{p.x * n, p.y * n} }
+func (a Pos) Manhathan(b Pos) int { return Abs(a.x-b.x) + Abs(a.y-b.y) }
 
 func Gcd(a, b int) int {
 	for b != 0 {
@@ -103,4 +104,12 @@ func StrDiff(s1, s2 string) (indexes []int) {
 		}
 	}
 	return
+}
+
+func CopyMap[K comparable, V any](m map[K]V) map[K]V {
+	new := make(map[K]V)
+	for k, v := range m {
+		new[k] = v
+	}
+	return new
 }
