@@ -125,7 +125,6 @@ func day23Part1(input string) string {
 
 func day23Part2(input string) string {
 	graph, start, stop := toTrailMap(input, false)
-	fmt.Println(start, "->", stop)
 	return fmt.Sprint(dfs23(graph, start, stop, 0, make(map[Pos]bool), []Pos{start}))
 }
 
@@ -136,10 +135,9 @@ func Day23(test bool) {
 	}
 
 	input, err := os.ReadFile(path)
-
 	check(err)
-	p1 := day23Part1(string(input))
-	p2 := day23Part2(string(input))
 
-	fmt.Printf("Day 23\n\tPuzzle 1: %s\n\tPuzzle 2: %s\n", p1, p2)
+	fmt.Println("Day 23")
+	fmt.Println("\tPart 1:", day23Part1(string(input)))
+	fmt.Println("\tPart 2:", day23Part2(string(input)))
 }

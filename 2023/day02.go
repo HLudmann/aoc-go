@@ -105,10 +105,9 @@ func Day02(test bool) {
 	}
 
 	input, err := os.ReadFile(path)
-
 	check(err)
-	p1 := day02Part1(string(input))
-	p2 := day02Part2(string(input))
 
-	fmt.Printf("Day 02\n\tPuzzle 1: %s\n\tPuzzle 2: %s\n", p1, p2)
+	fmt.Println("Day 02")
+	fmt.Println("\tPart 1:", day02Part1(string(input)))
+	fmt.Println("\tPart 2:", day02Part2(string(input)))
 }

@@ -129,13 +129,8 @@ func day22Part2(input string) string {
 	blocks := toJentris(input)
 	var count int
 	for _, b := range blocks {
-		// fmt.Println(*b)
-		// fmt.Println()
 		fell := make(map[*SandBlock]bool)
 		queue := b.OnTop
-		// for q := range queue {
-		// 	fmt.Println(*q)
-		// }
 		for len(queue) != 0 {
 			nq := make(map[*SandBlock]bool)
 			for b2 := range queue {
@@ -154,13 +149,8 @@ func day22Part2(input string) string {
 				}
 			}
 			queue = nq
-			// fmt.Println()
-			// for q := range queue {
-			// 	fmt.Println(*q)
-			// }
 		}
 		count += len(fell)
-		// fmt.Printf("\n\n")
 	}
 	return fmt.Sprint(count)
 }
@@ -172,10 +162,9 @@ func Day22(test bool) {
 	}
 
 	input, err := os.ReadFile(path)
-
 	check(err)
-	p1 := day22Part1(string(input))
-	p2 := day22Part2(string(input))
 
-	fmt.Printf("Day 22\n\tPuzzle 1: %s\n\tPuzzle 2: %s\n", p1, p2)
+	fmt.Println("Day 22")
+	fmt.Println("\tPart 1:", day22Part1(string(input)))
+	fmt.Println("\tPart 2:", day22Part2(string(input)))
 }

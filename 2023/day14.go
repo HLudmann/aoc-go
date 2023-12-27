@@ -55,7 +55,6 @@ func (mp *MirrorPlatform) Println() {
 				line += "#"
 			}
 		}
-		fmt.Println(line)
 	}
 }
 
@@ -175,10 +174,9 @@ func Day14(test bool) {
 	}
 
 	input, err := os.ReadFile(path)
-
 	check(err)
-	p1 := day14Part1(string(input))
-	p2 := day14Part2(string(input))
 
-	fmt.Printf("Day 14\n\tPuzzle 1: %s\n\tPuzzle 2: %s\n", p1, p2)
+	fmt.Println("Day 14")
+	fmt.Println("\tPart 1:", day14Part1(string(input)))
+	fmt.Println("\tPart 2:", day14Part2(string(input)))
 }
