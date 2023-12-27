@@ -25,6 +25,10 @@ func toInt(str string) int {
 	return digit
 }
 
+func toFloat(str string) float64 {
+	return float64(toInt(str))
+}
+
 func toLines(input string) (lines []string) {
 	for _, line := range strings.Split(input, "\n") {
 		if line == "" {
